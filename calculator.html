@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casio Style Scientific Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            width: 100%;
+            max-width: 380px;
+            background: linear-gradient(180deg, #2a2540 0%, #1f1a35 100%);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(138, 43, 226, 0.3);
+            border: 2px solid #3a2f5a;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a2f5a;
+        }
+
+        .brand {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e8e8e8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .model {
+            font-size: 9px;
+            color: #999;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .display-section {
+            background: linear-gradient(180deg, #b8d4f1 0%, #a8c4e1 100%);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 0, 0, 0.1),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .previous-operand {
+            font-size: 11px;
+            color: #2a2a4a;
+            min-height: 16px;
+            margin-bottom: 4px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .current-operand {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1a1a3a;
+            word-wrap: break-word;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            line-height: 1.2;
+            min-height: 40px;
+        }
+
+        .function-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .fn-btn {
+            padding: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: linear-gradient(180deg, #8a4fc9 0%, #6f38a0 100%);
+            color: #fff;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #5a2a7f;
+        }
+
+        .fn-btn:hover {
+            background: linear-gradient(180deg, #9a5fd9 0%, #7f48b0 100%);
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .fn-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        button {
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Number buttons - Light gray */
+        .number {
+            background: linear-gradient(180deg, #c8c8d8 0%, #b8b8c8 100%);
+            color: #1a1a2a;
+            border: 1px solid #a8a8b8;
+            font-weight: 700;
+        }
+
+        .number:hover {
+            background: linear-gradient(180deg, #d8d8e8 0%, #c8c8d8 100%);
+        }
+
+        /* Operation buttons - Dark with purple tint */
+        .operation {
+            background: linear-gradient(180deg, #4a3f5a 0%, #3a2f4a 100%);
+            color: #d8d8ff;
+            border: 1px solid #2a1f3a;
+            font-size: 16px;
+        }
+
+        .operation:hover {
+            background: linear-gradient(180deg, #5a4f6a 0%, #4a3f5a 100%);
+        }
+
+        /* Action buttons - Orange */
+        .action {
+            background: linear-gradient(180deg, #ff9f43 0%, #f07a3b 100%);
+            color: #fff;
+            border: 1px solid #e68a33;
+            font-weight: 700;
+        }
+
+        .action:hover {
+            background: linear-gradient(180deg, #ffb070 0%, #f58c4f 100%);
+        }
+
+        .action.clear {
+            grid-column: span 1;
+        }
+
+        /* Equals button - Orange accent */
+        .equals {
+            background: linear-gradient(180deg, #ff9f43 0%, #f07a3b 100%);
+            color: #fff;
+            border: 1px solid #e68a33;
+            font-weight: 700;
+            grid-column: span 1;
+        }
+
+        .equals:hover {
+            background: linear-gradient(180deg, #ffb070 0%, #f58c4f 100%);
+        }
+
+        /* Scientific buttons - Purple secondary functions */
+        .scientific {
+            background: linear-gradient(180deg, #7a5fa9 0%, #6a4f99 100%);
+            color: #fff;
+            border: 1px solid #5a3f89;
+            font-size: 12px;
+        }
+
+        .scientific:hover {
+            background: linear-gradient(180deg, #8a6fb9 0%, #7a5fa9 100%);
+        }
+
+        .sci-panel {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .sci-panel.active {
+            max-height: 500px;
+            opacity: 1;
+            margin-bottom: 10px;
+        }
+
+        .mode-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 6px 12px;
+            font-size: 10px;
+            border: 1px solid #3a2f5a;
+            background: rgba(138, 43, 226, 0.2);
+            color: #b8d4ff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mode-btn:hover {
+            background: rgba(138, 43, 226, 0.4);
+            box-shadow: 0 0 8px rgba(138, 43, 226, 0.3);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(180deg, #8a4fc9 0%, #6f38a0 100%);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(138, 43, 226, 0.5);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 8px;
+            color: #777;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== COMPREHENSIVE RESPONSIVE DESIGN ===== */
+
+        /* Ultra Small Devices (320px - 380px) */
+        @media (max-width: 380px) {
+            .calculator-container {
+                max-width: 100%;
+                padding: 12px;
+                border-radius: 16px;
+                margin: 0 8px;
+            }
+
+            .header {
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+            }
+
+            .brand {
+                font-size: 12px;
+            }
+
+            .model {
+                font-size: 8px;
+            }
+
+            .display-section {
+                padding: 10px;
+                margin-bottom: 10px;
+                min-height: 55px;
+            }
+
+            .current-operand {
+                font-size: 24px;
+                min-height: 32px;
+            }
+
+            .previous-operand {
+                font-size: 10px;
+            }
+
+            .function-buttons {
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+
+            .fn-btn {
+                padding: 6px;
+                font-size: 7px;
+            }
+
+            .mode-controls {
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+
+            .mode-btn {
+                padding: 5px 10px;
+                font-size: 9px;
+            }
+
+            .main-buttons {
+                gap: 6px;
+                margin-bottom: 6px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 12px;
+                border-radius: 6px;
+            }
+
+            .sci-panel {
+                gap: 6px;
+            }
+
+            .footer {
+                font-size: 7px;
+                margin-top: 8px;
+            }
+        }
+
+        /* Extra Small Devices (380px - 480px) */
+        @media (min-width: 381px) and (max-width: 480px) {
+            .calculator-container {
+                max-width: 100%;
+                padding: 14px;
+                border-radius: 18px;
+            }
+
+            .header {
+                margin-bottom: 12px;
+                padding-bottom: 10px;
+            }
+
+            .brand {
+                font-size: 13px;
+            }
+
+            .model {
+                font-size: 8px;
+            }
+
+            .display-section {
+                padding: 12px;
+                margin-bottom: 12px;
+                min-height: 60px;
+            }
+
+            .current-operand {
+                font-size: 28px;
+                min-height: 36px;
+            }
+
+            .previous-operand {
+                font-size: 10px;
+            }
+
+            .function-buttons {
+                gap: 7px;
+                margin-bottom: 9px;
+            }
+
+            .fn-btn {
+                padding: 7px;
+                font-size: 8px;
+            }
+
+            .mode-controls {
+                gap: 7px;
+                margin-bottom: 9px;
+            }
+
+            .mode-btn {
+                padding: 6px 11px;
+                font-size: 9px;
+            }
+
+            .main-buttons {
+                gap: 7px;
+                margin-bottom: 7px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 13px;
+                border-radius: 7px;
+            }
+
+            .sci-panel {
+                gap: 7px;
+            }
+
+            .footer {
+                font-size: 8px;
+                margin-top: 9px;
+            }
+        }
+
+        /* Small Phones (481px - 640px) */
+        @media (min-width: 481px) and (max-width: 640px) {
+            .calculator-container {
+                max-width: 100%;
+                padding: 16px;
+                border-radius: 20px;
+            }
+
+            .header {
+                margin-bottom: 14px;
+                padding-bottom: 12px;
+            }
+
+            .brand {
+                font-size: 14px;
+            }
+
+            .model {
+                font-size: 9px;
+            }
+
+            .display-section {
+                padding: 13px;
+                margin-bottom: 14px;
+                min-height: 65px;
+            }
+
+            .current-operand {
+                font-size: 30px;
+                min-height: 38px;
+            }
+
+            .previous-operand {
+                font-size: 11px;
+            }
+
+            .function-buttons {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .fn-btn {
+                padding: 8px;
+                font-size: 9px;
+            }
+
+            .mode-controls {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .mode-btn {
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+
+            .main-buttons {
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+
+            button {
+                padding: 13px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+
+            .sci-panel {
+                gap: 8px;
+            }
+
+            .footer {
+                font-size: 8px;
+                margin-top: 10px;
+            }
+        }
+
+        /* Medium Phones (641px - 768px) */
+        @media (min-width: 641px) and (max-width: 768px) {
+            .calculator-container {
+                max-width: 420px;
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .header {
+                margin-bottom: 15px;
+                padding-bottom: 13px;
+            }
+
+            .brand {
+                font-size: 15px;
+            }
+
+            .model {
+                font-size: 9px;
+            }
+
+            .display-section {
+                padding: 15px;
+                margin-bottom: 15px;
+                min-height: 70px;
+            }
+
+            .current-operand {
+                font-size: 32px;
+                min-height: 40px;
+            }
+
+            .previous-operand {
+                font-size: 12px;
+            }
+
+            .function-buttons {
+                gap: 8px;
+                margin-bottom: 11px;
+            }
+
+            .fn-btn {
+                padding: 9px;
+                font-size: 9px;
+            }
+
+            .mode-controls {
+                gap: 8px;
+                margin-bottom: 11px;
+            }
+
+            .mode-btn {
+                padding: 7px 13px;
+                font-size: 10px;
+            }
+
+            .main-buttons {
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+
+            button {
+                padding: 14px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+
+            .sci-panel {
+                gap: 8px;
+            }
+
+            .footer {
+                font-size: 9px;
+                margin-top: 11px;
+            }
+        }
+
+        /* Tablets Portrait (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .calculator-container {
+                max-width: 420px;
+                padding: 20px;
+                border-radius: 24px;
+            }
+
+            .header {
+                margin-bottom: 16px;
+                padding-bottom: 14px;
+            }
+
+            .brand {
+                font-size: 15px;
+            }
+
+            .model {
+                font-size: 10px;
+            }
+
+            .display-section {
+                padding: 16px;
+                margin-bottom: 16px;
+                min-height: 75px;
+            }
+
+            .current-operand {
+                font-size: 34px;
+                min-height: 42px;
+            }
+
+            .previous-operand {
+                font-size: 12px;
+            }
+
+            .function-buttons {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .fn-btn {
+                padding: 9px;
+                font-size: 10px;
+            }
+
+            .mode-controls {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .mode-btn {
+                padding: 7px 14px;
+                font-size: 10px;
+            }
+
+            .main-buttons {
+                gap: 8px;
+                margin-bottom: 9px;
+            }
+
+            button {
+                padding: 15px;
+                font-size: 14px;
+                border-radius: 9px;
+            }
+
+            .sci-panel {
+                gap: 8px;
+            }
+
+            .footer {
+                font-size: 9px;
+                margin-top: 12px;
+            }
+        }
+
+        /* Large Tablets (1025px - 1280px) */
+        @media (min-width: 1025px) and (max-width: 1280px) {
+            .calculator-container {
+                max-width: 450px;
+                padding: 22px;
+                border-radius: 24px;
+            }
+
+            .header {
+                margin-bottom: 17px;
+                padding-bottom: 15px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .model {
+                font-size: 10px;
+            }
+
+            .display-section {
+                padding: 17px;
+                margin-bottom: 17px;
+                min-height: 78px;
+            }
+
+            .current-operand {
+                font-size: 36px;
+                min-height: 44px;
+            }
+
+            .previous-operand {
+                font-size: 13px;
+            }
+
+            .function-buttons {
+                gap: 9px;
+                margin-bottom: 13px;
+            }
+
+            .fn-btn {
+                padding: 10px;
+                font-size: 10px;
+            }
+
+            .mode-controls {
+                gap: 9px;
+                margin-bottom: 13px;
+            }
+
+            .mode-btn {
+                padding: 8px 15px;
+                font-size: 10px;
+            }
+
+            .main-buttons {
+                gap: 9px;
+                margin-bottom: 9px;
+            }
+
+            button {
+                padding: 16px;
+                font-size: 15px;
+                border-radius: 9px;
+            }
+
+            .sci-panel {
+                gap: 9px;
+            }
+
+            .footer {
+                font-size: 9px;
+                margin-top: 13px;
+            }
+        }
+
+        /* Desktops (1281px - 1920px) */
+        @media (min-width: 1281px) and (max-width: 1920px) {
+            .calculator-container {
+                max-width: 480px;
+                padding: 24px;
+                border-radius: 28px;
+            }
+
+            .header {
+                margin-bottom: 18px;
+                padding-bottom: 16px;
+            }
+
+            .brand {
+                font-size: 17px;
+            }
+
+            .model {
+                font-size: 11px;
+            }
+
+            .display-section {
+                padding: 18px;
+                margin-bottom: 18px;
+                min-height: 82px;
+            }
+
+            .current-operand {
+                font-size: 38px;
+                min-height: 46px;
+            }
+
+            .previous-operand {
+                font-size: 13px;
+            }
+
+            .function-buttons {
+                gap: 10px;
+                margin-bottom: 14px;
+            }
+
+            .fn-btn {
+                padding: 11px;
+                font-size: 11px;
+            }
+
+            .mode-controls {
+                gap: 10px;
+                margin-bottom: 14px;
+            }
+
+            .mode-btn {
+                padding: 8px 16px;
+                font-size: 11px;
+            }
+
+            .main-buttons {
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            button {
+                padding: 17px;
+                font-size: 16px;
+                border-radius: 10px;
+            }
+
+            .sci-panel {
+                gap: 10px;
+            }
+
+            .footer {
+                font-size: 10px;
+                margin-top: 14px;
+            }
+        }
+
+        /* Ultra Wide Screens (1921px+) */
+        @media (min-width: 1921px) {
+            .calculator-container {
+                max-width: 520px;
+                padding: 28px;
+                border-radius: 32px;
+            }
+
+            .header {
+                margin-bottom: 20px;
+                padding-bottom: 18px;
+            }
+
+            .brand {
+                font-size: 18px;
+            }
+
+            .model {
+                font-size: 12px;
+            }
+
+            .display-section {
+                padding: 20px;
+                margin-bottom: 20px;
+                min-height: 88px;
+            }
+
+            .current-operand {
+                font-size: 42px;
+                min-height: 50px;
+            }
+
+            .previous-operand {
+                font-size: 14px;
+            }
+
+            .function-buttons {
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .fn-btn {
+                padding: 12px;
+                font-size: 12px;
+            }
+
+            .mode-controls {
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .mode-btn {
+                padding: 9px 18px;
+                font-size: 12px;
+            }
+
+            .main-buttons {
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            button {
+                padding: 19px;
+                font-size: 17px;
+                border-radius: 11px;
+            }
+
+            .sci-panel {
+                gap: 12px;
+            }
+
+            .footer {
+                font-size: 11px;
+                margin-top: 16px;
+            }
+        }
+
+        /* Landscape Orientation */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+
+            .calculator-container {
+                max-width: 100%;
+                padding: 12px;
+            }
+
+            .header {
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+            }
+
+            .brand {
+                font-size: 12px;
+            }
+
+            .display-section {
+                padding: 10px;
+                margin-bottom: 10px;
+                min-height: 50px;
+            }
+
+            .current-operand {
+                font-size: 20px;
+                min-height: 28px;
+            }
+
+            .previous-operand {
+                font-size: 10px;
+            }
+
+            .function-buttons,
+            .main-buttons,
+            .sci-panel {
+                gap: 6px;
+                margin-bottom: 6px;
+            }
+
+            .fn-btn {
+                padding: 6px;
+                font-size: 8px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 11px;
+                border-radius: 6px;
+            }
+
+            .footer {
+                font-size: 7px;
+                margin-top: 6px;
+            }
+        }
+
+        /* High DPI / Retina Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+               (min-resolution: 192dpi) {
+            .calculator-container,
+            button,
+            .fn-btn {
+                border-width: 1px;
+            }
+        }
+
+        /* Touch Devices Optimization */
+        @media (hover: none) and (pointer: coarse) {
+            button,
+            .fn-btn,
+            .mode-btn {
+                min-height: 44px;
+                min-width: 44px;
+                padding: 16px;
+            }
+
+            button:active,
+            .fn-btn:active,
+            .mode-btn:active {
+                background: linear-gradient(180deg, #ff9f43 0%, #f07a3b 100%);
+                transform: scale(0.98);
+            }
+        }
+
+        /* Foldable Devices */
+        @media (screen-spanning: single-fold-vertical) {
+            .calculator-container {
+                max-width: calc(100vw / 2);
+                margin-left: 2px;
+            }
+        }
+
+        @media (screen-spanning: single-fold-horizontal) {
+            .calculator-container {
+                max-height: calc(100vh / 2);
+                overflow-y: auto;
+            }
+        }
+
+        /* Print Media */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .calculator-container {
+                max-width: 100%;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .display-section {
+                background: #f5f5f5;
+            }
+
+            button {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Dark Mode Preference */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #0a0a15 0%, #05050f 100%);
+            }
+
+            .calculator-container {
+                background: linear-gradient(180deg, #1f1a30 0%, #15100a 100%);
+            }
+        }
+
+        /* Reduced Motion Preference */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="header">
+            <div>
+                <div class="brand">Casio</div>
+                <div class="model">fx-CALC PLUS</div>
+            </div>
+        </div>
+
+        <div class="display-section">
+            <div class="previous-operand"></div>
+            <div class="current-operand">0</div>
+        </div>
+
+        <div class="function-buttons">
+            <button class="fn-btn" id="calcBtn">CALC</button>
+            <button class="fn-btn">ALPHA</button>
+            <button class="fn-btn">SHIFT</button>
+            <button class="fn-btn">MODE</button>
+            <button class="fn-btn">SETUP</button>
+        </div>
+
+        <div class="mode-controls">
+            <button class="mode-btn active" id="angleToggle" data-angle="deg">DEG</button>
+            <button class="mode-btn" id="sciToggle">SCI MODE</button>
+        </div>
+
+        <div class="sci-panel" id="sciPanel">
+            <button class="scientific" data-func="sin">sin</button>
+            <button class="scientific" data-func="cos">cos</button>
+            <button class="scientific" data-func="tan">tan</button>
+            <button class="scientific" data-func="asin">asin</button>
+            <button class="scientific" data-func="acos">acos</button>
+            <button class="scientific" data-func="atan">atan</button>
+            <button class="scientific" data-func="log">log</button>
+            <button class="scientific" data-func="ln">ln</button>
+            <button class="scientific" data-func="sqrt">√x</button>
+            <button class="scientific" data-func="power">x^y</button>
+            <button class="scientific" data-func="factorial">x!</button>
+            <button class="scientific" data-func="pi">π</button>
+            <button class="scientific" data-func="e">e</button>
+            <button class="scientific" data-func="abs">|x|</button>
+            <button class="scientific" data-func="exp">e^x</button>
+        </div>
+
+        <div class="main-buttons">
+            <!-- Row 1 -->
+            <button class="action clear" id="clearBtn">AC</button>
+            <button class="action" id="deleteBtn">DEL</button>
+            <button class="operation">(</button>
+            <button class="operation">)</button>
+            <button class="operation">÷</button>
+
+            <!-- Row 2 -->
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operation">×</button>
+            <button class="operation">−</button>
+
+            <!-- Row 3 -->
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operation">.</button>
+            <button class="operation">+</button>
+
+            <!-- Row 4 -->
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="operation">=</button>
+            <button class="equals" id="equalsBtn">=</button>
+
+            <!-- Row 5 -->
+            <button class="number" style="grid-column: span 2;">0</button>
+            <button class="operation">.</button>
+            <button class="operation">exp</button>
+            <button class="operation">Ans</button>
+        </div>
+
+        <div class="footer">
+            © 2024 CASIO STYLE CALCULATOR
+        </div>
+    </div>
+
+    <script>
+        class CasioCalculator {
+            constructor(previousOperandElement, currentOperandElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.angleMode = 'deg';
+                this.lastAnswer = 0;
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.updateDisplay();
+            }
+
+            delete() {
+                this.currentOperand = this.currentOperand.toString().slice(0, -1);
+                this.updateDisplay();
+            }
+
+            appendNumber(number) {
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                this.currentOperand = this.currentOperand.toString() + number.toString();
+                this.updateDisplay();
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === '') {
+                    if (this.previousOperand === '') return;
+                    this.operation = operation;
+                    this.updateDisplay();
+                    return;
+                }
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+                this.updateDisplay();
+            }
+
+            applySingleFunction(func) {
+                const value = parseFloat(this.currentOperand);
+                if (isNaN(value)) return;
+
+                let result;
+                const angle = this.angleMode === 'deg' ? value * Math.PI / 180 : value;
+
+                switch(func) {
+                    case 'sin': result = Math.sin(angle); break;
+                    case 'cos': result = Math.cos(angle); break;
+                    case 'tan': result = Math.tan(angle); break;
+                    case 'asin':
+                        result = Math.asin(value);
+                        if (this.angleMode === 'deg') result = result * 180 / Math.PI;
+                        break;
+                    case 'acos':
+                        result = Math.acos(value);
+                        if (this.angleMode === 'deg') result = result * 180 / Math.PI;
+                        break;
+                    case 'atan':
+                        result = Math.atan(value);
+                        if (this.angleMode === 'deg') result = result * 180 / Math.PI;
+                        break;
+                    case 'log': result = Math.log10(value); break;
+                    case 'ln': result = Math.log(value); break;
+                    case 'sqrt': result = Math.sqrt(value); break;
+                    case 'factorial':
+                        if (value < 0 || value % 1 !== 0) {
+                            alert('Factorial requires non-negative integers');
+                            return;
+                        }
+                        result = this.factorial(value);
+                        break;
+                    case 'abs': result = Math.abs(value); break;
+                    case 'exp': result = Math.exp(value); break;
+                    default: return;
+                }
+
+                this.currentOperand = result.toString();
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.updateDisplay();
+            }
+
+            applyConstant(constant) {
+                switch(constant) {
+                    case 'pi':
+                        this.currentOperand = Math.PI.toString();
+                        break;
+                    case 'e':
+                        this.currentOperand = Math.E.toString();
+                        break;
+                }
+                this.updateDisplay();
+            }
+
+            startPowerOperation() {
+                if (this.currentOperand === '') return;
+                this.operation = '^';
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+                this.updateDisplay();
+            }
+
+            factorial(n) {
+                if (n === 0 || n === 1) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) result *= i;
+                return result;
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (this.operation) {
+                    case '+': computation = prev + current; break;
+                    case '−': computation = prev - current; break;
+                    case '×': computation = prev * current; break;
+                    case '÷':
+                        if (current === 0) {
+                            alert('Math Error');
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    case '^': computation = Math.pow(prev, current); break;
+                    case '%': computation = prev % current; break;
+                    default: return;
+                }
+
+                this.lastAnswer = computation;
+                this.currentOperand = computation.toString();
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.updateDisplay();
+            }
+
+            formatNumber(num) {
+                if (num === '' || num === undefined) return '';
+                
+                const numStr = num.toString();
+                const parsedNum = parseFloat(numStr);
+                if (isNaN(parsedNum)) return numStr;
+                
+                const digitsOnly = numStr.replace(/[.-]/g, '');
+                if (digitsOnly.length > 12) {
+                    return parsedNum.toExponential(4);
+                }
+                
+                return numStr.length > 14 ? numStr.substring(0, 14) : numStr;
+            }
+
+            updateDisplay() {
+                this.currentOperandElement.innerText = this.formatNumber(this.currentOperand) || '0';
+                if (this.operation != null) {
+                    this.previousOperandElement.innerText = 
+                        `${this.formatNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandElement.innerText = '';
+                }
+            }
+        }
+
+        // Initialize
+        const previousElement = document.querySelector('.previous-operand');
+        const currentElement = document.querySelector('.current-operand');
+        const calculator = new CasioCalculator(previousElement, currentElement);
+
+        // Number buttons
+        document.querySelectorAll('.number').forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.appendNumber(button.innerText);
+            });
+        });
+
+        // Operation buttons
+        document.querySelectorAll('.operation').forEach(button => {
+            button.addEventListener('click', () => {
+                const text = button.innerText;
+                if (text === '=') {
+                    calculator.compute();
+                } else {
+                    calculator.chooseOperation(text);
+                }
+            });
+        });
+
+        // Action buttons
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            calculator.clear();
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            calculator.delete();
+        });
+
+        document.getElementById('equalsBtn').addEventListener('click', () => {
+            calculator.compute();
+        });
+
+        // Scientific buttons
+        document.querySelectorAll('.scientific').forEach(button => {
+            button.addEventListener('click', () => {
+                const func = button.dataset.func;
+                if (func === 'pi' || func === 'e') {
+                    calculator.applyConstant(func);
+                } else if (func === 'power') {
+                    calculator.startPowerOperation();
+                } else {
+                    calculator.applySingleFunction(func);
+                }
+            });
+        });
+
+        // Mode toggles
+        document.getElementById('sciToggle').addEventListener('click', function() {
+            const sciPanel = document.getElementById('sciPanel');
+            sciPanel.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        document.getElementById('angleToggle').addEventListener('click', function() {
+            calculator.angleMode = calculator.angleMode === 'deg' ? 'rad' : 'deg';
+            this.innerText = calculator.angleMode === 'deg' ? 'DEG' : 'RAD';
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') calculator.appendNumber(e.key);
+            if (e.key === '.') calculator.appendNumber(e.key);
+            if (e.key === '+') { e.preventDefault(); calculator.chooseOperation('+'); }
+            if (e.key === '-') { e.preventDefault(); calculator.chooseOperation('−'); }
+            if (e.key === '*') { e.preventDefault(); calculator.chooseOperation('×'); }
+            if (e.key === '/') { e.preventDefault(); calculator.chooseOperation('÷'); }
+            if (e.key === '^') { e.preventDefault(); calculator.startPowerOperation(); }
+            if (e.key === '%') { e.preventDefault(); calculator.chooseOperation('%'); }
+            if (e.key === 'Enter') { e.preventDefault(); calculator.compute(); }
+            if (e.key === 'Backspace') calculator.delete();
+            if (e.key === 'Escape') calculator.clear();
+        });
+    </script>
+</body>
+</html>
